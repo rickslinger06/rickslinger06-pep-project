@@ -2,6 +2,7 @@ package Service;
 
 import DAO.AccountDAOImpl;
 import Model.Account;
+import Model.Message;
 
 public class AccountService {
 
@@ -33,4 +34,6 @@ public class AccountService {
     
         return authenticatedAccount;
     }
+
+  
 }

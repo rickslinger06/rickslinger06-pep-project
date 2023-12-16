@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import Model.Account;
 import Util.ConnectionUtil;
@@ -134,6 +136,35 @@ public class AccountDAOImpl implements AccountDAO {
     
         return authenticatedAccount;
     }
+
+    @Override
+    public List<Account> findAllAccounts() {
+        List<Account> accounts = new ArrayList<>();
+    
+        try (Connection connection = ConnectionUtil.getConnection()) {
+            String sql = "SELECT * FROM account";
+            PreparedStatement psmt = connection.prepareStatement(sql);
+            ResultSet resultSet = psmt.executeQuery();
+    
+            while (resultSet.next()) {
+                // Assuming Account class constructor or setter methods to create Account objects
+                Account account = new Account(
+                    resultSet.getInt("account_id"),
+                    resultSet.getString("account_name")
+          
+                );
+    
+                // Add the created Account object to the list
+                accounts.add(account);
+            }
+        } catch (SQLException e) {
+            // Handle exceptions appropriately
+            e.printStackTrace();
+        }
+        
+        return accounts;
+    }
+    
     
 
 

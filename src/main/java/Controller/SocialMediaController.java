@@ -1,7 +1,9 @@
 package Controller;
 
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
+import Service.MessageService;
 import io.javalin.Javalin;
 import io.javalin.http.Context;
 
@@ -22,6 +24,7 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.post("/register", this::registerAccount);
         app.post("/login", this::login);
+        app.post("messages", this::createMessage);
 
         return app;
     }
@@ -71,6 +74,30 @@ public class SocialMediaController {
             context.status(401); // Unauthorized status for failed login attempts
         }
         return loginAccount;
+    }
+
+   private Message createMessage(Context context){
+
+        Message msg = context.bodyAsClass(Message.class);
+        MessageService msgService = new MessageService();
+
+        if(msgService.checkMessageTextIsBlank(msg)){
+            context.status(400);
+        }
+
+        if(msgService.checkMessageIsoverLimit(msg)){
+            context.status(400);
+        }
+
+        if(msgService.isPosterAnExistingUser(msg)){
+            context.status(400);
+        }
+
+       msgService.createNewMessage(msg);
+       context.status(200).json(msg);
+        return msg;
+
+
     }
 
 }
