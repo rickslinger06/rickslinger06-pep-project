@@ -19,6 +19,7 @@ public class MessageService {
     public boolean checkMessageTextIsBlank(Message msg){
 
         return msg.getMessage_text().isBlank();
+        
     }
 
     public boolean checkMessageIsoverLimit(Message msg){
@@ -37,6 +38,17 @@ public class MessageService {
         }
 
     return true;
+
+    }
+
+    public List<Message> findAllMessages(){
+
+        MessageDAOImpl msgDAO = new MessageDAOImpl();
+
+        List<Message> listOfMessages = msgDAO.findAllMessages();
+
+        return listOfMessages;
+
 
     }
     

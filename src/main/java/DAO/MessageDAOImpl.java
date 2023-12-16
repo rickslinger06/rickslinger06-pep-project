@@ -3,6 +3,9 @@ package DAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import Model.Message;
 import Util.ConnectionUtil;
@@ -31,6 +34,61 @@ public class MessageDAOImpl implements MessageDAO {
     }
     return message; // Return the updated message object with the generated ID
 }
+
+@Override
+public List<Message> findAllMessages() {
+    List<Message> messages = new ArrayList<>();
+
+    try (Connection connection = ConnectionUtil.getConnection()) {
+        String sql = "SELECT * FROM message";
+        PreparedStatement psmt = connection.prepareStatement(sql);
+        ResultSet resultSet = psmt.executeQuery();
+
+        while (resultSet.next()) {
+            // Assuming Message class constructor or setter methods to create Message objects
+            Message message = new Message(
+                resultSet.getInt("message_id"),
+                resultSet.getInt("posted_by"),
+                resultSet.getString("message_text"),
+                resultSet.getLong("time_posted_epoch")
+         
+            );
+
+            // Add the created Message object to the list
+            messages.add(message);
+        }
+    } catch (SQLException e) {
+        // Handle exceptions appropriately
+        e.printStackTrace();
+    }
+    
+    return messages;
+}
+
+
+    @Override
+    public Message findById(int id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
+    }
+
+    @Override
+    public void deleteById(int id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+    }
+
+    @Override
+    public void updateMesage(int id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'updateMesage'");
+    }
+
+    @Override
+    public List<Message> findMessagesByUserId(int user_id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'findMessagesByUserId'");
+    }
     
  
 

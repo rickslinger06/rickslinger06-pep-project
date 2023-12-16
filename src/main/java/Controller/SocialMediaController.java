@@ -1,5 +1,7 @@
 package Controller;
 
+import java.util.List;
+
 import Model.Account;
 import Model.Message;
 import Service.AccountService;
@@ -24,7 +26,8 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.post("/register", this::registerAccount);
         app.post("/login", this::login);
-        app.post("messages", this::createMessage);
+        app.post("/messages", this::createMessage);
+        app.get("/messages", this::retrieveAllMessages);
 
         return app;
     }
@@ -83,21 +86,39 @@ public class SocialMediaController {
 
         if(msgService.checkMessageTextIsBlank(msg)){
             context.status(400);
+            return null;
+            
         }
 
         if(msgService.checkMessageIsoverLimit(msg)){
             context.status(400);
+            return null;
         }
 
         if(msgService.isPosterAnExistingUser(msg)){
             context.status(400);
+            return null;
         }
 
        msgService.createNewMessage(msg);
        context.status(200).json(msg);
+
         return msg;
 
 
+    }
+    
+
+    private List<Message> retrieveAllMessages(Context context){
+
+        MessageService msgService = new MessageService();
+
+        List<Message> listOfMessages = msgService.findAllMessages();
+        context.status(200).jsonStream(listOfMessages);
+
+      return listOfMessages;
+     
+   
     }
 
 }
