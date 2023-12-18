@@ -165,8 +165,27 @@ public class AccountDAOImpl implements AccountDAO {
         return accounts;
     }
     
-    
+    public Account findById(int id) {
+      
+        try (Connection connection = ConnectionUtil.getConnection()) {
+            String sql = "SELECT * FROM account WHERE id = ?";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
 
+            if (rs.next()) {
+                Account account = new Account();
+                account.setAccount_id(id);
+                account.setUsername(rs.getString("username"));
+          
+                return account;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exceptions appropriately
+        }
+        return null; // Return null if account not found or on error
+    }
 
     
 }

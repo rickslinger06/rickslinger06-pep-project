@@ -28,6 +28,9 @@ public class SocialMediaController {
         app.post("/login", this::login);
         app.post("/messages", this::createMessage);
         app.get("/messages", this::retrieveAllMessages);
+        app.get("/messages/{id}", this::findMessageById); 
+        app.patch("/messages/{id}", this::updateMessage);
+        app.delete("/messages/{id}", this::deleteMessage);
 
         return app;
     }
@@ -79,34 +82,25 @@ public class SocialMediaController {
         return loginAccount;
     }
 
-   private Message createMessage(Context context){
-
+    private void createMessage(Context context) {
         Message msg = context.bodyAsClass(Message.class);
         MessageService msgService = new MessageService();
-
-        if(msgService.checkMessageTextIsBlank(msg)){
+    
+        if (msgService.checkMessageTextIsBlank(msg) ||
+            msgService.checkMessageIsoverLimit(msg) ||
+            !msgService.isPosterAnExistingUser(msg)) {
             context.status(400);
-            return null;
-            
+         
         }
+    
+        msgService.createNewMessage(msg);
+        context.status(200).json(msg); // Message successfully created
 
-        if(msgService.checkMessageIsoverLimit(msg)){
-            context.status(400);
-            return null;
-        }
-
-        if(msgService.isPosterAnExistingUser(msg)){
-            context.status(400);
-            return null;
-        }
-
-       msgService.createNewMessage(msg);
-       context.status(200).json(msg);
-
-        return msg;
-
-
+     
     }
+   
+
+    
     
 
     private List<Message> retrieveAllMessages(Context context){
@@ -118,7 +112,58 @@ public class SocialMediaController {
 
       return listOfMessages;
      
-   
     }
+    private void findMessageById(Context context) {
+
+        int id = Integer.parseInt(context.pathParam("id"));
+        MessageService msgService = new MessageService();
+        Message foundMessage = msgService.findByMessageId(id);
+    
+        if (foundMessage != null) {
+            context.json(foundMessage); 
+            context.status(200);
+        }
+    }
+
+    private void updateMessage(Context context) {
+        int id = Integer.parseInt(context.pathParam("id"));
+    
+        MessageService msgService = new MessageService();
+        Message existingMessage = msgService.findByMessageId(id);
+    
+        if (existingMessage == null) {
+            context.status(400);
+            return;
+        }
+    
+        String updatedText = context.formParam("message_text");
+        if (updatedText == null || updatedText.isEmpty() || updatedText.length() > 255) {
+            context.status(400);
+            return;
+        }
+
+    
+        existingMessage.setMessage_text(updatedText);
+      
+        Message updatedMessage = msgService.updateMessage(existingMessage);
+    
+        if (updatedMessage != null) {
+            context.status(200).json(updatedMessage);
+            return;
+        }
+
+    
+    
+    }
+    
+    
+
+    private void deleteMessage(Context context){
+
+      
+    }
+
+
+    
 
 }

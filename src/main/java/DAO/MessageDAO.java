@@ -10,7 +10,7 @@ public interface MessageDAO {
     List<Message> findAllMessages();
     Message findById(int id);
     void deleteById(int id);
-    void updateMesage(int id);
+    Message updateMessage(Message message);
     List<Message>findMessagesByUserId(int user_id);
 
 

@@ -29,15 +29,13 @@ public class MessageService {
     public boolean isPosterAnExistingUser(Message msg){
         AccountDAOImpl acctDAO = new AccountDAOImpl();
 
-        List<Account> listOfAccounts = acctDAO.findAllAccounts();
+        Account account = acctDAO.findById(msg.getPosted_by());
 
-        for(Account i : listOfAccounts){
-            if(msg.getMessage_id() == i.getAccount_id()){
-                return false;
-            }
+        if(account !=null){
+            return true;
         }
 
-    return true;
+    return false;
 
     }
 
@@ -48,8 +46,15 @@ public class MessageService {
         List<Message> listOfMessages = msgDAO.findAllMessages();
 
         return listOfMessages;
+    }
 
+    public Message findByMessageId(int id){
 
+        return msgDAO.findById(id);
+    }
+
+    public Message updateMessage(Message message){
+        return msgDAO.updateMessage(message);
     }
     
 }
