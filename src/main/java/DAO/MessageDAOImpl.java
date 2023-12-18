@@ -11,7 +11,11 @@ import Model.Message;
 import Util.ConnectionUtil;
 
 public class MessageDAOImpl implements MessageDAO {
-
+     /**
+      * 
+     * @param message
+     * @return Return the updated message object with the auto generated ID
+     */
     @Override
     public Message createNewMessage(Message message) {
         try (Connection cnn = ConnectionUtil.getConnection()) {
@@ -27,17 +31,24 @@ public class MessageDAOImpl implements MessageDAO {
             if (rowsAffected > 0) {
                 ResultSet generatedKeys = pstm.getGeneratedKeys();
                 if (generatedKeys.next()) {
-                    int messageId = generatedKeys.getInt(1); // Assuming the ID column is the first generated key
-                    message.setMessage_id(messageId); // Set the generated ID to the message object
+                    // the ID column is the first generated key
+                    int messageId = generatedKeys.getInt(1); 
+                    // Set the generated ID to the message object
+                    message.setMessage_id(messageId); 
                 }
             }
         } catch (Exception e) {
-            // Handle exceptions here
+            e.getMessage();
         }
-        return message; // Return the updated message object with the generated ID
+        return message;
     }
     
 
+      /**
+      * 
+     * 
+     * @return List of all messages
+     */
 @Override
 public List<Message> findAllMessages() {
     List<Message> messages = new ArrayList<>();
@@ -48,7 +59,7 @@ public List<Message> findAllMessages() {
         ResultSet resultSet = psmt.executeQuery();
 
         while (resultSet.next()) {
-            // Assuming Message class constructor or setter methods to create Message objects
+            // Message class constructor or setter methods to create Message objects
             Message message = new Message(
                 resultSet.getInt("message_id"),
                 resultSet.getInt("posted_by"),
@@ -61,14 +72,17 @@ public List<Message> findAllMessages() {
             messages.add(message);
         }
     } catch (SQLException e) {
-        // Handle exceptions appropriately
-        e.printStackTrace();
+        e.getMessage();
     }
     
     return messages;
 }
 
-
+  /**
+      * 
+     * @param id 
+     * @return Return the message object by message_id
+     */
 @Override
 public Message findById(int id) {
     try (Connection conn = ConnectionUtil.getConnection()) {
@@ -91,13 +105,17 @@ public Message findById(int id) {
             return null;
         }
     } catch (Exception e) {
-        // Handle exceptions appropriately
-        System.out.println(e.getMessage());
+        e.getMessage();
     }
     return null;
 }
 
 
+  /**
+      * 
+     * @param id
+     * delete the message by message_id
+     */
    @Override
     public void deleteById(int id) {
     try (Connection conn = ConnectionUtil.getConnection()) {
@@ -106,15 +124,20 @@ public Message findById(int id) {
         PreparedStatement pstm = conn.prepareStatement(sql);
         pstm.setInt(1, id);
 
+        //execute the the statement
        pstm.executeUpdate();
         
     } catch (Exception e) {
-        // Handle exceptions appropriately
         e.printStackTrace();
     }
 }
 
 
+  /**
+      * 
+     * @param message
+     * @return Return the updated message object
+     */
     @Override
     public Message updateMessage(Message message) {
         try (Connection cnn = ConnectionUtil.getConnection()) {
@@ -130,14 +153,17 @@ public Message findById(int id) {
                 return message;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions properly
+            e.printStackTrace(); 
         }
-        return null; // Return null if the update fails or on error
+        // Return null if the update fails or on error
+        return null; 
     }
     
-
-    
-
+     /**
+      * 
+     * @param user_id
+     * @return Return List of messages by user_id
+     */
     @Override
     public List<Message> findMessagesByUserId(int user_id) {
         List<Message> messages = new ArrayList<>();
@@ -148,7 +174,8 @@ public Message findById(int id) {
             pstm.setInt(1, user_id);
     
             ResultSet resultSet = pstm.executeQuery();
-    
+            
+            //looping all the messages posted by user_id and created new message
             while (resultSet.next()) {
                 Message message = new Message(
                     resultSet.getInt("message_id"),
@@ -156,15 +183,17 @@ public Message findById(int id) {
                     resultSet.getString("message_text"),
                     resultSet.getLong("time_posted_epoch")
                 );
+
+                //adding to the list
                 messages.add(message);
             }
         } catch (SQLException e) {
-            // Properly handle the exception (log it or perform necessary actions)
-            e.printStackTrace(); // Example: Print the exception for demonstration purposes
-            // Consider throwing a custom exception or handling it according to your application's logic
+            e.printStackTrace(); 
+
         }
     
-        return messages; // Return the list of messages
+        // Return the list of messages
+        return messages; 
     }
     
     

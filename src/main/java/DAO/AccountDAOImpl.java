@@ -137,6 +137,10 @@ public class AccountDAOImpl implements AccountDAO {
         return authenticatedAccount;
     }
 
+     /**
+     * 
+     * @return List of all accounts
+     */
     @Override
     public List<Account> findAllAccounts() {
         List<Account> accounts = new ArrayList<>();
@@ -147,7 +151,7 @@ public class AccountDAOImpl implements AccountDAO {
             ResultSet resultSet = psmt.executeQuery();
     
             while (resultSet.next()) {
-                // Assuming Account class constructor or setter methods to create Account objects
+                // Account class constructor or setter methods to create Account objects
                 Account account = new Account(
                     resultSet.getInt("account_id"),
                     resultSet.getString("account_name")
@@ -158,13 +162,17 @@ public class AccountDAOImpl implements AccountDAO {
                 accounts.add(account);
             }
         } catch (SQLException e) {
-            // Handle exceptions appropriately
             e.printStackTrace();
         }
         
         return accounts;
     }
     
+     /**
+     * 
+     * @param id
+     * @return account found by account_id
+     */
     public Account findById(int id) {
       
         try (Connection connection = ConnectionUtil.getConnection()) {
@@ -182,9 +190,10 @@ public class AccountDAOImpl implements AccountDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle exceptions appropriately
+
         }
-        return null; // Return null if account not found or on error
+        // Return null if account not found or on error
+        return null; 
     }
 
     
