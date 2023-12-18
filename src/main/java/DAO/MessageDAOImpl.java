@@ -127,7 +127,7 @@ public Message findById(int id) {
     
             if (rowsAffected > 0) {
                 // Update successful, return the updated message
-                return findById(message.getMessage_id());
+                return message;
             }
         } catch (SQLException e) {
             e.printStackTrace(); // Handle exceptions properly
