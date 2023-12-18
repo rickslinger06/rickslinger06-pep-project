@@ -175,7 +175,7 @@ public class AccountDAOImpl implements AccountDAO {
 
             if (rs.next()) {
                 Account account = new Account();
-                account.setAccount_id(id);
+                account.setAccount_id(rs.getInt("account_id"));
                 account.setUsername(rs.getString("username"));
           
                 return account;

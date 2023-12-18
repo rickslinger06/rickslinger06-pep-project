@@ -9,14 +9,23 @@ import Model.Message;
 
 public class MessageService {
 
-    MessageDAOImpl msgDAO = new MessageDAOImpl();
+    MessageDAOImpl msgDAO;
 
 
-    public void createNewMessage(Message msg) {
-        msgDAO.createNewMessage(msg);
+    public MessageService(MessageDAOImpl msgDao){
+        this.msgDAO =msgDao;
+    }
+
+  
+
+
+    public Message createNewMessage(Message msg) {
+        MessageDAOImpl msgDAO = new MessageDAOImpl();
+        return msgDAO.createNewMessage(msg);
     }
 
     public boolean checkMessageTextIsBlank(Message msg){
+        
 
         return msg.getMessage_text().isBlank();
         
@@ -27,21 +36,15 @@ public class MessageService {
     }
 
     public boolean isPosterAnExistingUser(Message msg){
+        int posterId = msg.getPosted_by();
         AccountDAOImpl acctDAO = new AccountDAOImpl();
-
-        Account account = acctDAO.findById(msg.getPosted_by());
-
-        if(account !=null){
-            return true;
-        }
-
-    return false;
-
+        Account account = acctDAO.findById(posterId);
+    
+        return account != null;
     }
+    
 
     public List<Message> findAllMessages(){
-
-        MessageDAOImpl msgDAO = new MessageDAOImpl();
 
         List<Message> listOfMessages = msgDAO.findAllMessages();
 
@@ -54,7 +57,13 @@ public class MessageService {
     }
 
     public Message updateMessage(Message message){
+
         return msgDAO.updateMessage(message);
+    }
+
+    public void deleteMessage(int id){
+
+        msgDAO.deleteById(id);
     }
     
 }

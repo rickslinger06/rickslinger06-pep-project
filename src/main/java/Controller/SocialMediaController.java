@@ -2,6 +2,7 @@ package Controller;
 
 import java.util.List;
 
+import DAO.MessageDAOImpl;
 import Model.Account;
 import Model.Message;
 import Service.AccountService;
@@ -15,6 +16,10 @@ import io.javalin.http.Context;
  * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
  */
 public class SocialMediaController {
+
+    MessageDAOImpl msgDAo = new MessageDAOImpl();
+    MessageService msgService = new MessageService(msgDAo);
+
 
  
     /**
@@ -84,19 +89,34 @@ public class SocialMediaController {
 
     private void createMessage(Context context) {
         Message msg = context.bodyAsClass(Message.class);
-        MessageService msgService = new MessageService();
-    
-        if (msgService.checkMessageTextIsBlank(msg) ||
-            msgService.checkMessageIsoverLimit(msg) ||
-            !msgService.isPosterAnExistingUser(msg)) {
-            context.status(400);
-         
+
+        try {
+
+            if(msgService.checkMessageIsoverLimit(msg)){
+                context.status(400);
+                return;
+            }
+
+            if(msgService.checkMessageTextIsBlank(msg)){
+                context.status(400);
+                return;
+            }
+
+            if(!msgService.isPosterAnExistingUser(msg)){
+                context.status(400);
+                return;
+               
+            }
+            
+            Message createdMessage = msgService.createNewMessage(msg);
+        if (createdMessage != null) {
+            context.status(200).json(createdMessage); // Return the newly created message
+        }
+          
+        } catch (Exception e) {
+            // TODO: handle exception
         }
     
-        msgService.createNewMessage(msg);
-        context.status(200).json(msg); // Message successfully created
-
-     
     }
    
 
@@ -105,18 +125,16 @@ public class SocialMediaController {
 
     private List<Message> retrieveAllMessages(Context context){
 
-        MessageService msgService = new MessageService();
-
         List<Message> listOfMessages = msgService.findAllMessages();
         context.status(200).jsonStream(listOfMessages);
 
       return listOfMessages;
      
     }
+
     private void findMessageById(Context context) {
 
         int id = Integer.parseInt(context.pathParam("id"));
-        MessageService msgService = new MessageService();
         Message foundMessage = msgService.findByMessageId(id);
     
         if (foundMessage != null) {
@@ -128,7 +146,7 @@ public class SocialMediaController {
     private void updateMessage(Context context) {
         int id = Integer.parseInt(context.pathParam("id"));
     
-        MessageService msgService = new MessageService();
+
         Message existingMessage = msgService.findByMessageId(id);
     
         if (existingMessage == null) {
@@ -146,7 +164,7 @@ public class SocialMediaController {
         existingMessage.setMessage_text(updatedText);
       
         Message updatedMessage = msgService.updateMessage(existingMessage);
-    
+
         if (updatedMessage != null) {
             context.status(200).json(updatedMessage);
             return;
@@ -159,9 +177,18 @@ public class SocialMediaController {
     
 
     private void deleteMessage(Context context){
-
-      
+        int id = Integer.parseInt(context.pathParam("id"));
+    
+        Message foundMessage = msgService.findByMessageId(id);
+        
+        if (foundMessage != null) {
+            msgService.deleteMessage(id);
+            context.status(200).json(foundMessage);
+        } else {
+            context.status(200).result("");
+        }
     }
+    
 
 
     

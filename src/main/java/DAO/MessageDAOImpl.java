@@ -15,10 +15,11 @@ public class MessageDAOImpl implements MessageDAO {
     @Override
     public Message createNewMessage(Message message) {
         try (Connection cnn = ConnectionUtil.getConnection()) {
-            String sql = "INSERT INTO message (posted_by, message_text, time_posted_epoch) VALUES (?,?,?)";
+            String sql = "INSERT INTO message (message_text,posted_by, time_posted_epoch) VALUES (?,?,?)";
             PreparedStatement pstm = cnn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-            pstm.setInt(1, message.getPosted_by());
-            pstm.setString(2, message.getMessage_text());
+
+            pstm.setString(1, message.getMessage_text());
+            pstm.setInt(2, message.getPosted_by());
             pstm.setLong(3, message.getTime_posted_epoch());
     
             int rowsAffected = pstm.executeUpdate();
@@ -97,11 +98,22 @@ public Message findById(int id) {
 }
 
 
-    @Override
+   @Override
     public void deleteById(int id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
+    try (Connection conn = ConnectionUtil.getConnection()) {
+        String sql = "DELETE FROM message WHERE message_id = ?";
+
+        PreparedStatement pstm = conn.prepareStatement(sql);
+        pstm.setInt(1, id);
+
+       pstm.executeUpdate();
+        
+    } catch (Exception e) {
+        // Handle exceptions appropriately
+        e.printStackTrace();
     }
+}
+
 
     @Override
     public Message updateMessage(Message message) {
@@ -110,11 +122,11 @@ public Message findById(int id) {
             PreparedStatement pstm = cnn.prepareStatement(sql);
             pstm.setString(1, message.getMessage_text());
             pstm.setInt(2, message.getMessage_id());
-
+    
             int rowsAffected = pstm.executeUpdate();
-
+    
             if (rowsAffected > 0) {
-                // Update successful, fetch the updated message from the database
+                // Update successful, return the updated message
                 return findById(message.getMessage_id());
             }
         } catch (SQLException e) {
@@ -122,6 +134,7 @@ public Message findById(int id) {
         }
         return null; // Return null if the update fails or on error
     }
+    
 
     
 
