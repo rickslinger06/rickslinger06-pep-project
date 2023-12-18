@@ -34,6 +34,7 @@ public class SocialMediaController {
         app.post("/messages", this::createMessage);
         app.get("/messages", this::retrieveAllMessages);
         app.get("/messages/{id}", this::findMessageById); 
+        app.get("/accounts/{account_id}/messages", this::findMessagesByUserId); 
         app.patch("/messages/{id}", this::updateMessage);
         app.delete("/messages/{id}", this::deleteMessage);
 
@@ -189,6 +190,14 @@ public class SocialMediaController {
         }
     }
     
+    public void findMessagesByUserId(Context context){
+        int id = Integer.parseInt(context.pathParam("account_id"));
+
+        List<Message> listOfMessages = msgDAo.findMessagesByUserId(id);
+
+            context.status(200).json(listOfMessages);
+
+    }
 
 
     

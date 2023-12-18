@@ -65,5 +65,12 @@ public class MessageService {
 
         msgDAO.deleteById(id);
     }
+
+    public List<Message> findAllMessageByUserId(int id){
+
+        List<Message> list = msgDAO.findMessagesByUserId(id);
+        return list;
+
+    }
     
 }

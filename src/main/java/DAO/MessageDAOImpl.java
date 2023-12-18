@@ -140,9 +140,33 @@ public Message findById(int id) {
 
     @Override
     public List<Message> findMessagesByUserId(int user_id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findMessagesByUserId'");
+        List<Message> messages = new ArrayList<>();
+    
+        try (Connection cnn = ConnectionUtil.getConnection()) {
+            String sql = "SELECT * FROM message WHERE posted_by = ?";
+            PreparedStatement pstm = cnn.prepareStatement(sql);
+            pstm.setInt(1, user_id);
+    
+            ResultSet resultSet = pstm.executeQuery();
+    
+            while (resultSet.next()) {
+                Message message = new Message(
+                    resultSet.getInt("message_id"),
+                    resultSet.getInt("posted_by"),
+                    resultSet.getString("message_text"),
+                    resultSet.getLong("time_posted_epoch")
+                );
+                messages.add(message);
+            }
+        } catch (SQLException e) {
+            // Properly handle the exception (log it or perform necessary actions)
+            e.printStackTrace(); // Example: Print the exception for demonstration purposes
+            // Consider throwing a custom exception or handling it according to your application's logic
+        }
+    
+        return messages; // Return the list of messages
     }
+    
     
  
 
